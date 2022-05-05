@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+
+<head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title>my to do list</title>
+</head>
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: verdana;
+    }
+
+    body {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgb(36,0,16);
+        background: linear-gradient(90deg, rgba(36,0,16,1) 0%, rgba(35,171,247,1) 0%, rgba(0,255,196,1) 100%);
+    }
+
+    .todo-content {
+        height: 550px;
+        width: 600px;
+        background: whitesmoke;
+        border-radius: 5px;
+        box-shadow: 0 5px 10px rgba(0, 0, 0, 0.5);
+        padding: 10px;
+        margin: 50px;
+
+    }
+
+    input {
+        height: 50px;
+        width: 75%;
+        outline: none;
+        border: none;
+        border-radius: 5px;
+        background: #666;
+        color: whitesmoke;
+        padding: 0 10px;
+        margin: 15px 0;
+    }
+
+    .todo-input::placeholder {
+        color: whitesmoke;
+    }
+
+    .add-todo {
+        height: 50px;
+        width: 20%;
+        border-radius: 5px;
+        outline: none;
+        border: none;
+        background: #666;
+        color: whitesmoke;
+        border: none;
+        cursor: pointer;
+    }
+
+    .list-row textarea {
+        width: 100%;
+        background: transparent;
+        border: none;
+        color: green;
+        font-size: 17px;
+    }
+
+    .line-through {
+        text-decoration: line-through;
+    }
+
+    .edit-todo,
+    .update-todo,
+    .remove-todo {
+        padding: 0px 5px;
+        cursor: pointer;
+    }
+
+   
+
+    .todo-content .todo-list {
+        padding-left: 0px;
+        background: #ccc;
+    }
+
+    .todo-content .list-error,
+    .error {
+        color: red;
+    }
+
+    .todo-content .todo-list .list-row {
+        padding: 5px 10px;
+        position: relative;
+        word-break: break-all;
+        display: flex;
+        font-size: 18px;
+        transition: .1s;
+        cursor: pointer;
+    }
+
+    .todo-content .list-row .list-data,
+    .todo-content .list-row .update-data {
+        width: 100%;
+        text-align: justify;
+    }
+
+    .todo-list .edit-todo,
+    .remove-todo,
+    .update-todo {
+        visibility: hidden;
+    }
+
+    .todo-content .todo-list .list-row:hover .edit-todo {
+        visibility: visible;
+    }
+
+    .todo-content .todo-list .list-row:hover .remove-todo {
+        visibility: visible;
+    }
+
+    .todo-content .todo-list .list-row:hover .update-todo {
+        visibility: visible;
+    }
+</style>
+
+<body>
+    <div class="todo-content">
+        <div class="todo-input">
+            <input type="text" class="todo-input" placeholder="write your task ...">
+            <button class="add-todo" type="button">ADD</button>
+        </div>
+        <div class="error"></div>
+        <div class="todo-list">
+        </div>
+
+        <script>
+            // add to do list script
+            $(document).on('click', '.add-todo', function () {
+                var todoInputData = $(this).siblings('input').val();
+                var todoListData = `<div class="row-parent">
+          <div class="list-row">
+          <div class="list-data">`+ todoInputData + `</div>
+          <div class="edit-todo">&#9998;</div>
+          <div class="remove-todo">&#x2715;</div>
+          </div>
+          <div class="list-error"></div></div>`;
+
+                if ($.trim(todoInputData) == '') {
+                    $(this).parents('.todo-content').find('.error').text('You must enter something!');
+                }
+                else {
+                    $(this).parents('.todo-content').find('.todo-list').append(todoListData);
+                    $(this).parents('.todo-content').find('.error').empty();
+                }
+                $(this).siblings('input').val('')
+            });
+
+            // add todo list on pressing Enter key 
+            $(document).keydown(function (event) {
+                if (event.which == 13) {
+                    event.preventDefault();
+                    $('.add-todo').click();
+
+                }
+            });
+
+
+            // remove todo list script
+            $(document).on('click', '.remove-todo', function () {
+                $(this).parent('.list-row').remove();
+                
+            })
+
+            // edit todo list script
+            $(document).on('click', '.edit-todo', function () {
+                $(this).attr('class', 'update-todo');
+                $(this).html('&#x2713;');
+                var listText = $(this).parent('.list-row').find('.list-data').html();
+                var listDataHeight = $(this).parent('.list-row').find('.list-data').innerHeight();
+                $(this).parent('.list-row').find('.list-data').attr('class', 'update-data');
+
+                if (listDataHeight > 50) {
+                    $(this).parent('.list-row').find('.update-data').html('<textarea style="height:' + listDataHeight + 'px">' + listText + '</textarea>');
+                } else {
+                    $(this).parent('.list-row').find('.update-data').html('<textarea style="height:' + listDataHeight + 'px">' + listText + '</textarea>');
+                }
+
+            });
+
+            //update todo script
+            $(document).on('click', '.update-todo', function () {
+                var listText = $(this).parent('.list-row').find('textarea').val();
+                if ($.trim(listText) == '') {
+                    $(this).parents('.row-parent').find('.list-error').text('You must enter something!');
+                } else {
+                    $(this).attr('class', 'edit-todo');
+                    $(this).html('&#9998;');
+                    $(this).parent('.list-row').find('.update-data').attr('class', 'list-data');
+                    var listText = $(this).parent('.list-row').find('.list-data').html(listText);
+                    $(this).parents('.row-parent').find('.list-error').empty();
+                }
+            });
+
+            // line through the  todo list script
+            $(document).on('click', '.list-data', function () {
+                $(this).toggleClass('line-through');
+            });
+        </script>
+</body>
+
+</html>
